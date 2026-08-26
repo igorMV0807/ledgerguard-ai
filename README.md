@@ -97,7 +97,8 @@ The diagram describes the approved target architecture. Only the Next.js synthet
 - AI output may propose an investigation but cannot approve or execute it;
 - NetSuite and Patchworks experience will not be claimed without a real authorised integration.
 
-See [Technical Design Document](docs/TDD.md) and [Security](docs/SECURITY.md).
+See the [Technical Design Document](docs/TDD.md), [Security](docs/SECURITY.md),
+[90-second demo script](docs/DEMO_SCRIPT.md), and [interview walkthrough](docs/INTERVIEW_GUIDE.md).
 
 ## Language
 
