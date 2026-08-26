@@ -32,7 +32,7 @@ The recording must show only the synthetic application, source code, tests, arch
 
 **Narration:**
 
-> The agent cannot move money or approve itself. A finance manager decides whether to open an investigation, and that decision is designed to enter the audit log.
+> The agent cannot move money or approve itself. I approve only the investigation. The decision is saved under my isolated demo session and added to the audit trail.
 
 ## 62–76 seconds — operational evidence
 
@@ -48,7 +48,7 @@ The recording must show only the synthetic application, source code, tests, arch
 
 **Narration:**
 
-> The product uses Next.js and TypeScript, with a Vercel preview workflow and automated checks. The next milestone adds an isolated Supabase project with migrations, tested RLS, and a webhook Edge Function, followed by an n8n reconciliation workflow.
+> The product uses Next.js and TypeScript on Vercel, Supabase Postgres with RLS, a signed idempotent Edge Function, and a sanitized n8n workflow with retries. Automated checks cover the financial rule, webhook signature, database security contract, and workflow exports.
 
 End with the portfolio and repository links.
 
@@ -61,3 +61,15 @@ End with the portfolio and repository links.
 - [ ] Cursor movements rehearsed
 - [ ] Narration understandable without technical background
 - [ ] Final length between 75 and 100 seconds
+
+## Recording sequence
+
+Open these tabs before recording and never open an environment-settings screen:
+
+1. live dashboard overview;
+2. exception `LG-1042` detail;
+3. automations view;
+4. audit view;
+5. GitHub pull request checks and the README architecture diagram.
+
+Record at 1080p, zoom the browser to 110–125%, hide bookmarks and notifications, and use a clean cursor path. Add subtitles because many LinkedIn viewers watch without sound.

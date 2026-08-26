@@ -1,0 +1,160 @@
+{
+  "name": "LedgerGuard - Signed reconciliation demo",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual demo trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-660, -100]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ledgerguard-synthetic-event",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Synthetic event webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-660, 100],
+      "webhookId": "ledgerguard-synthetic-event"
+    },
+    {
+      "parameters": {
+        "jsCode": "const incoming = $json.body ?? $json;\nconst sample = { event_id: `evt_demo_${Date.now()}`, type: 'payout.updated', organization_slug: 'ledgerguard-demo', occurred_at: new Date().toISOString(), order: { external_id: `LG-${Date.now()}`, brand_slug: 'aurora-home', currency: 'GBP', gross_amount_pence: 12000, refund_amount_pence: 2000, fee_amount_pence: 350 }, payout: { external_id: `PO-${Date.now()}`, actual_payout_pence: 7650, paid_at: new Date().toISOString() } };\nconst event = incoming.event_id ? incoming : sample;\nreturn [{ json: { event, rawBody: JSON.stringify(event), correlationId: event.event_id } }];"
+      },
+      "id": "prepare-event",
+      "name": "Validate and serialize event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-400, 0]
+    },
+    {
+      "parameters": {
+        "action": "hmac",
+        "type": "SHA256",
+        "value": "={{ $json.rawBody }}",
+        "secret": "={{ $env.N8N_WEBHOOK_SECRET }}",
+        "encoding": "hex",
+        "propertyName": "signature"
+      },
+      "id": "sign-event",
+      "name": "Sign with HMAC SHA-256",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [-150, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.LEDGERGUARD_EDGE_FUNCTION_URL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "content-type", "value": "application/json" },
+            { "name": "x-ledgerguard-signature", "value": "=sha256={{ $json.signature }}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.rawBody }}",
+        "options": {
+          "response": { "response": { "neverError": false, "responseFormat": "json" } },
+          "timeout": 15000
+        }
+      },
+      "id": "send-edge-function",
+      "name": "Send to isolated Edge Function",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [100, 0],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "duplicate-check",
+              "leftValue": "={{ $json.duplicate }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "duplicate-check",
+      "name": "Duplicate event?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [360, -80]
+    },
+    {
+      "parameters": {},
+      "id": "duplicate-result",
+      "name": "Duplicate safely ignored",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [620, -160]
+    },
+    {
+      "parameters": {},
+      "id": "processed-result",
+      "name": "Reconciliation accepted",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [620, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => ({ json: { status: 'failed', correlationId: item.json.correlationId ?? 'unknown', error: 'Sanitized workflow failure', occurredAt: new Date().toISOString() } }));"
+      },
+      "id": "sanitize-error",
+      "name": "Sanitize failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [360, 160]
+    }
+  ],
+  "connections": {
+    "Manual demo trigger": { "main": [[{ "node": "Validate and serialize event", "type": "main", "index": 0 }]] },
+    "Synthetic event webhook": { "main": [[{ "node": "Validate and serialize event", "type": "main", "index": 0 }]] },
+    "Validate and serialize event": { "main": [[{ "node": "Sign with HMAC SHA-256", "type": "main", "index": 0 }]] },
+    "Sign with HMAC SHA-256": { "main": [[{ "node": "Send to isolated Edge Function", "type": "main", "index": 0 }]] },
+    "Send to isolated Edge Function": {
+      "main": [
+        [{ "node": "Duplicate event?", "type": "main", "index": 0 }],
+        [{ "node": "Sanitize failure", "type": "main", "index": 0 }]
+      ]
+    },
+    "Duplicate event?": {
+      "main": [
+        [{ "node": "Duplicate safely ignored", "type": "main", "index": 0 }],
+        [{ "node": "Reconciliation accepted", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "active": false,
+  "versionId": "2dcd52af-0f8a-4aae-a72c-21d6197a7440",
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": []
+}

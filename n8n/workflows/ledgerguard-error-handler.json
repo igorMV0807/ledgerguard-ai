@@ -1,0 +1,45 @@
+{
+  "name": "LedgerGuard - Sanitized error handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [-260, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const execution = $json.execution ?? {};\nreturn [{ json: { workflow: $json.workflow?.name ?? 'unknown', executionId: execution.id ?? 'unknown', status: 'failed', message: 'Sanitized workflow failure', occurredAt: new Date().toISOString() } }];"
+      },
+      "id": "redact",
+      "name": "Redact error details",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {},
+      "id": "review-queue",
+      "name": "Ready for operator review",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [250, 0]
+    }
+  ],
+  "connections": {
+    "Error Trigger": { "main": [[{ "node": "Redact error details", "type": "main", "index": 0 }]] },
+    "Redact error details": { "main": [[{ "node": "Ready for operator review", "type": "main", "index": 0 }]] }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none"
+  },
+  "active": false,
+  "versionId": "ea0d5fcb-2a76-4d5a-93e8-751a5a446285",
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": []
+}

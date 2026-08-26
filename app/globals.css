@@ -221,6 +221,12 @@ p {
   color: var(--accent);
 }
 
+.connection-note {
+  margin: -12px 0 22px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .section-heading,
 .detail-heading {
   display: flex;
@@ -425,6 +431,12 @@ p {
 
 .primary-button:hover {
   background: #104d3c;
+}
+
+.primary-button:disabled,
+.danger-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .empty-state {

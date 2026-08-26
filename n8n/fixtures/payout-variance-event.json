@@ -1,0 +1,19 @@
+{
+  "event_id": "evt_demo_portfolio_001",
+  "type": "payout.updated",
+  "organization_slug": "ledgerguard-demo",
+  "occurred_at": "2026-08-26T09:42:00.000Z",
+  "order": {
+    "external_id": "LG-PORTFOLIO-001",
+    "brand_slug": "aurora-home",
+    "currency": "GBP",
+    "gross_amount_pence": 12000,
+    "refund_amount_pence": 2000,
+    "fee_amount_pence": 350
+  },
+  "payout": {
+    "external_id": "PO-PORTFOLIO-001",
+    "actual_payout_pence": 7650,
+    "paid_at": "2026-08-26T09:42:00.000Z"
+  }
+}

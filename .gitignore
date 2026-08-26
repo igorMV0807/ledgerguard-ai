@@ -20,6 +20,8 @@
 
 # Vercel
 .vercel
+.supabase-home
+.supabase
 
 # TypeScript
 *.tsbuildinfo
