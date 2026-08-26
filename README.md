@@ -4,6 +4,8 @@ LedgerGuard AI is a portfolio-safe finance operations product for multi-brand e-
 
 > **Current status:** foundation milestone. The application is functional with synthetic local data. Supabase, n8n, Shopify, Claude, and external financial systems are not connected yet.
 
+**Live demo:** [ledgerguard-ai-three.vercel.app](https://ledgerguard-ai-three.vercel.app)
+
 ![Synthetic LedgerGuard AI dashboard](docs/assets/dashboard-overview.png)
 
 ## Why this project exists
@@ -19,7 +21,7 @@ Finance teams can lose time investigating why an e-commerce payout does not matc
 - synthetic case `LG-1042` with a £20.00 payout variance;
 - local human approval interaction;
 - unit tests for the reconciliation rules;
-- CI, pull request template, and Vercel-ready configuration;
+- CI, pull request template, and an active Vercel deployment;
 - Claude Code project guidance and specialist agent definitions;
 - future integration boundaries for Supabase and n8n;
 - no secrets, customer data, or external requests.

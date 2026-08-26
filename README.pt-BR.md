@@ -4,6 +4,8 @@ O LedgerGuard AI é um produto de operações financeiras para conciliação de 
 
 > **Status atual:** fundação do projeto. A interface funciona com dados sintéticos locais. Supabase, n8n, Shopify, Claude e sistemas financeiros externos ainda não estão conectados.
 
+**Demonstração ao vivo:** [ledgerguard-ai-three.vercel.app](https://ledgerguard-ai-three.vercel.app)
+
 ![Dashboard sintético do LedgerGuard AI](docs/assets/dashboard-overview.png)
 
 ## O que já existe
@@ -15,7 +17,7 @@ O LedgerGuard AI é um produto de operações financeiras para conciliação de 
 - caso sintético `LG-1042` com uma diferença de £20,00;
 - aprovação humana simulada localmente;
 - testes unitários das regras de conciliação;
-- CI, template de pull request e configuração pronta para Vercel;
+- CI, template de pull request e publicação ativa na Vercel;
 - regras e agentes especializados para uso futuro no Claude Code;
 - separação preparada para Supabase e n8n;
 - nenhuma credencial, dado real ou chamada externa.
@@ -52,13 +54,11 @@ O comando executa lint, TypeScript, testes e build de produção.
 
 ## Próximos marcos
 
-1. revisar a fundação;
-2. publicar o primeiro Preview na Vercel;
-3. criar Supabase isolado com migrations, Auth, grants e RLS testada;
-4. criar Edge Function com assinatura e idempotência;
-5. criar workflow n8n com retry e falha final;
-6. integrar agentes e prompts versionados;
-7. preparar o case e o vídeo em inglês.
+1. criar Supabase isolado com migrations, Auth, grants e RLS testada;
+2. criar Edge Function com assinatura e idempotência;
+3. criar workflow n8n com retry e falha final;
+4. integrar agentes e prompts versionados;
+5. preparar o case e o vídeo em inglês.
 
 Consulte o [Technical Design Document](docs/TDD.md), as [regras de segurança](docs/SECURITY.md),
 o [roteiro de demonstração](docs/DEMO_SCRIPT.md) e o [guia para entrevista](docs/INTERVIEW_GUIDE.md).
