@@ -1,4 +1,10 @@
-import type { AuditEvent, AutomationRun, Brand, FinanceException } from "@/lib/types";
+import type {
+  AuditEvent,
+  AutomationRun,
+  Brand,
+  FinanceException,
+  LedgerGuardSnapshot,
+} from "@/lib/types";
 
 export const brands: Brand[] = [
   { id: "all", name: "All brands" },
@@ -13,6 +19,7 @@ export const periodSummary = {
   actualPayoutPence: 1_796_550,
   openVariancePence: 27_500,
   openExceptionCount: 10,
+  lastReconciledAt: "2026-08-26T09:42:25.000Z",
 };
 
 export const financeExceptions: FinanceException[] = [
@@ -22,6 +29,16 @@ export const financeExceptions: FinanceException[] = [
     brandId: "aurora-home",
     issue: "Refund mismatch",
     hypothesis: "The recorded refund may have been deducted twice.",
+    evidence: [
+      "Order gross: GBP 120.00",
+      "Refund: GBP 20.00",
+      "Processing fee: GBP 3.50",
+      "Actual payout: GBP 76.50",
+    ],
+    recommendedAction:
+      "Approve an investigation of the refund ledger. Do not move money automatically.",
+    analysisSource: "deterministic_fallback",
+    status: "needs_review",
     input: {
       grossAmountPence: 12_000,
       refundAmountPence: 2_000,
@@ -36,6 +53,15 @@ export const financeExceptions: FinanceException[] = [
     brandId: "northwind-kids",
     issue: "Missing payout item",
     hypothesis: "The order is not present in the current payout breakdown.",
+    evidence: [
+      "Order gross: GBP 210.00",
+      "Processing fee: GBP 26.00",
+      "Actual payout: GBP 149.00",
+    ],
+    recommendedAction:
+      "Approve a source-record investigation before contacting the payment provider.",
+    analysisSource: "deterministic_fallback",
+    status: "needs_review",
     input: {
       grossAmountPence: 21_000,
       refundAmountPence: 0,
@@ -93,3 +119,11 @@ export const auditEvents: AuditEvent[] = [
     timestamp: "09:39:04 UTC",
   },
 ];
+
+export const demoSnapshot: LedgerGuardSnapshot = {
+  brands,
+  periodSummary,
+  financeExceptions,
+  automationRuns,
+  auditEvents,
+};

@@ -18,10 +18,16 @@ export type ReconciliationResult = ReconciliationInput & {
 
 export type FinanceException = {
   id: string;
+  databaseId?: string;
+  organizationId?: string;
   orderId: string;
   brandId: string;
   issue: string;
   hypothesis: string;
+  evidence?: string[];
+  recommendedAction?: string;
+  analysisSource?: "claude" | "deterministic_fallback";
+  status?: "needs_review" | "approved" | "rejected";
   input: ReconciliationInput;
   openedAt: string;
 };
@@ -41,3 +47,24 @@ export type AuditEvent = {
   entity: string;
   timestamp: string;
 };
+
+export type PeriodSummary = {
+  orderCount: number;
+  matchedOrderCount: number;
+  expectedPayoutPence: number;
+  actualPayoutPence: number;
+  openVariancePence: number;
+  openExceptionCount: number;
+  lastReconciledAt: string;
+};
+
+export type LedgerGuardSnapshot = {
+  organizationId?: string;
+  brands: Brand[];
+  periodSummary: PeriodSummary;
+  financeExceptions: FinanceException[];
+  automationRuns: AutomationRun[];
+  auditEvents: AuditEvent[];
+};
+
+export type DashboardConnection = "connecting" | "supabase" | "local_fallback";

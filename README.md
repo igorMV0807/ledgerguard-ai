@@ -2,27 +2,32 @@
 
 LedgerGuard AI is a portfolio-safe finance operations product for multi-brand e-commerce reconciliation. It shows how order, refund, fee, and payout evidence can be combined into a deterministic calculation, an explainable AI-assisted investigation, and a human approval flow.
 
-> **Current status:** foundation milestone. The application is functional with synthetic local data. Supabase, n8n, Shopify, Claude, and external financial systems are not connected yet.
+> **Current status:** portfolio implementation complete locally. The public site still uses a safe local fallback until the new, isolated Supabase sandbox is provisioned and connected. No production system is used.
 
-![Synthetic LedgerGuard AI dashboard](docs/assets/dashboard-overview.png)
+**Live demo:** [ledgerguard-ai-three.vercel.app](https://ledgerguard-ai-three.vercel.app)
+
+![Synthetic LedgerGuard AI dashboard](docs/dashboard-overview.png)
 
 ## Why this project exists
 
 Finance teams can lose time investigating why an e-commerce payout does not match the expected value. LedgerGuard AI is designed to centralise that evidence, calculate the variance without AI, propose a traceable explanation with AI, and keep a person responsible for the final decision.
 
-## Current foundation
+## What is implemented
 
 - Next.js App Router with TypeScript;
 - responsive finance operations interface;
 - overview, exception, automation, and audit views;
 - deterministic reconciliation in integer minor units;
 - synthetic case `LG-1042` with a £20.00 payout variance;
-- local human approval interaction;
-- unit tests for the reconciliation rules;
-- CI, pull request template, and Vercel-ready configuration;
+- anonymous demo sessions and persistent human decisions when Supabase is configured;
+- Postgres migrations with explicit grants, RLS, constraints, indexes, and synthetic seed data;
+- a signed, idempotent Supabase Edge Function for synthetic commerce events;
+- bounded Claude analysis through a forced tool schema, with a transparent deterministic fallback;
+- disabled, sanitized n8n workflows with HMAC signing, retry, duplicate handling, and an error workflow;
+- automated tests for reconciliation, webhook HMAC, migration controls, and n8n exports;
+- CI, pull request template, and an active Vercel deployment;
 - Claude Code project guidance and specialist agent definitions;
-- future integration boundaries for Supabase and n8n;
-- no secrets, customer data, or external requests.
+- no secrets, customer data, production credentials, or production integrations.
 
 ## Demo story
 
@@ -54,11 +59,11 @@ pnpm check
 
 The command runs linting, TypeScript checks, unit tests, and a production build.
 
-## Architecture direction
+## Architecture
 
 ```mermaid
 flowchart LR
-    SOURCE[Shopify sandbox or synthetic generator] --> EDGE[Supabase Edge Function]
+    SOURCE[Synthetic generator or isolated n8n] -->|HMAC signed event| EDGE[Supabase Edge Function]
     EDGE --> DB[(Supabase Postgres + RLS)]
     DB --> N8N[n8n reconciliation]
     N8N --> RULES[Deterministic calculation]
@@ -69,7 +74,7 @@ flowchart LR
     AUDIT --> APP
 ```
 
-The diagram describes the approved target architecture. Only the Next.js synthetic foundation and reconciliation rules exist in this milestone.
+The public app signs visitors in anonymously to the isolated demo project. RLS allows them to read only the synthetic demo organisation and insert only their own review decision. The secret key remains inside the Edge Function.
 
 ## Repository map
 
@@ -81,10 +86,10 @@ The diagram describes the approved target architecture. Only the Next.js synthet
 ├── components/            # Product interface
 ├── docs/                  # TDD, security, and decision evidence
 ├── lib/                   # Types, synthetic data, deterministic rules
-├── n8n/                   # Future sanitized workflow boundary
-├── prompts/               # Future versioned runtime prompts
-├── supabase/              # Future migrations, functions, and RLS tests
-└── tests/                 # Automated rule tests
+├── n8n/                   # Disabled, sanitized workflow exports
+├── prompts/               # Versioned runtime prompt contract
+├── supabase/              # Migration, seed, RLS, and Edge Function
+└── tests/                 # Rule, security-contract, HMAC, and export tests
 ```
 
 ## Safety boundary
@@ -92,13 +97,14 @@ The diagram describes the approved target architecture. Only the Next.js synthet
 - public mode uses synthetic values only;
 - no production service is queried or modified;
 - no external integration is implied by placeholder folders;
-- future database access will require RLS and explicit grants;
+- database access uses RLS and explicit grants;
 - a service-role or secret key must never be exposed to the browser;
 - AI output may propose an investigation but cannot approve or execute it;
 - NetSuite and Patchworks experience will not be claimed without a real authorised integration.
 
 See the [Technical Design Document](docs/TDD.md), [Security](docs/SECURITY.md),
-[90-second demo script](docs/DEMO_SCRIPT.md), and [interview walkthrough](docs/INTERVIEW_GUIDE.md).
+[90-second demo script](docs/DEMO_SCRIPT.md), [portfolio case](docs/PORTFOLIO_CASE.md),
+and [application package](docs/APPLICATION_PACKAGE.md).
 
 ## Language
 

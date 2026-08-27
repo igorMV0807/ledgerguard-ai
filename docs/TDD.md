@@ -1,6 +1,6 @@
 # LedgerGuard AI — Technical Design Document
 
-**Status:** foundation approved for implementation  
+**Status:** implemented locally; isolated hosted sandbox pending
 **Language:** English, for portfolio and interview review  
 **Data classification:** synthetic only in the current milestone
 
@@ -40,7 +40,7 @@ The synthetic order `LG-1042` has:
 
 Deterministic TypeScript calculates the variance. The AI layer receives references to the order, refund, and payout and proposes that the refund may have been deducted twice. A finance manager may approve only the creation of an investigation.
 
-## 5. Current milestone
+## 5. Current implementation
 
 Implemented:
 
@@ -48,18 +48,22 @@ Implemented:
 - responsive synthetic dashboard;
 - overview, exceptions, automations, and audit views;
 - deterministic reconciliation module;
-- unit tests;
+- anonymous demo authentication boundary;
+- schema migration, explicit privileges, RLS policies, indexes, and seed;
+- signed and idempotent Edge Function;
+- structured Claude tool call with deterministic fallback;
+- sanitized n8n success, retry, duplicate, and error workflows;
+- unit and security-contract tests;
 - CI and review templates;
 - Claude Code project and specialist reviewer definitions.
 
-Not implemented yet:
+Pending external provisioning:
 
-- hosted Supabase project;
-- schema, migrations, RLS, and Edge Functions;
-- n8n workflows;
-- Shopify sandbox;
-- Anthropic API calls or runtime agents;
-- Vercel project and environment separation.
+- the new hosted Supabase sandbox and its project-specific keys;
+- deployment of the included Edge Function and secrets;
+- Vercel environment values for that sandbox;
+- optional Anthropic API key (the deterministic fallback remains functional without it);
+- importing the disabled n8n workflow into an isolated instance.
 
 ## 6. Target architecture
 
@@ -86,33 +90,31 @@ flowchart LR
     APP --> VERCEL[Vercel Preview and Production]
 ```
 
-## 7. Proposed data model
+## 7. Implemented data model
 
 | Table | Purpose | Security boundary |
 |---|---|---|
-| `profiles` | Minimal user presentation data | own row or authorised managers |
-| `brands` | Tenant-like brand boundary | active membership |
-| `brand_memberships` | User, brand, and role mapping | member and approved management paths |
-| `integration_events` | Immutable idempotent event intake | brand membership; writes through trusted server path |
-| `orders` | Normalised commerce order | brand membership |
-| `refunds` | Refund evidence | brand membership |
-| `payouts` | Payout header | brand membership |
-| `payout_items` | Order/payout relation | inherited through payout brand |
-| `reconciliations` | Deterministic expected/actual/variance record | brand membership |
-| `exceptions` | Human review case | role-aware brand membership |
-| `agent_runs` | Versioned AI input references and output | read by assigned brand; write through trusted path |
-| `action_proposals` | Advisory next action | analyst/manager read, trusted creation |
-| `approvals` | Human decision | manager creation, brand read |
+| `organizations` | Tenant boundary and explicit demo flag | demo visitor or membership |
+| `organization_memberships` | User and role mapping | own row or trusted server |
+| `brands` | Brand inside an organisation | organisation access |
+| `reconciliation_periods` | Dashboard aggregate for a fixed period | organisation access |
+| `orders` | Normalised synthetic order evidence | organisation access |
+| `payouts` | Synthetic payout evidence | organisation access |
+| `finance_exceptions` | Deterministic variance and bounded analysis | organisation access; trusted writes |
+| `human_decisions` | Reviewer-owned approval/rejection | own demo decision; trusted review |
 | `automation_runs` | n8n observability | brand-aware where applicable |
-| `audit_logs` | Append-only decision trail | read by assigned brand; trusted append only |
+| `webhook_events` | Private idempotency boundary | trusted Edge Function only |
+| `audit_events` | Append-only decision trail | organisation read; trusted append only |
 
-The actual migration will be created only after schema and policy review.
+The versioned migration is `supabase/migrations/20260826194257_ledgerguard_foundation.sql`.
 
 ## 8. Authorisation model
 
-- No anonymous access to operational tables.
+- The unauthenticated `anon` database role has no table grants.
+- Public visitors first receive a Supabase anonymous user session and therefore use the `authenticated` role.
+- An anonymous user can access only an organisation explicitly marked `is_demo = true`.
 - An authenticated user needs an active `brand_memberships` row for the same `brand_id`.
-- Managers can create approvals for assigned brands.
+- Demo visitors can insert only a decision with their own `auth.uid()` and cannot update finance records.
 - Analysts can investigate and propose but cannot approve.
 - Auditors are read-only.
 - Updates must use both row selection and resulting-row checks.
