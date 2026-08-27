@@ -2,7 +2,7 @@
 
 O LedgerGuard AI é um produto de operações financeiras para conciliação de e-commerce multimarcas. Esta edição foi criada para portfólio e utiliza somente informações fictícias.
 
-> **Status atual:** implementação de portfólio concluída localmente. O site público mantém um fallback seguro até o novo Supabase isolado ser criado e conectado. Nenhum sistema de produção é usado.
+> **Status atual:** a demonstração pública está conectada a um Supabase dedicado e isolado, usando somente dados fictícios. Nenhum sistema de produção é usado.
 
 **Demonstração ao vivo:** [ledgerguard-ai-three.vercel.app](https://ledgerguard-ai-three.vercel.app)
 
@@ -15,7 +15,7 @@ O LedgerGuard AI é um produto de operações financeiras para conciliação de 
 - visão geral, exceções, automações e auditoria;
 - cálculo financeiro determinístico em centavos;
 - caso sintético `LG-1042` com uma diferença de £20,00;
-- sessões anônimas de demonstração e decisões persistentes quando o Supabase está configurado;
+- sessões anônimas de demonstração e decisões persistentes no Supabase isolado;
 - migrations Postgres com grants explícitos, RLS, constraints, índices e seed sintético;
 - Edge Function com assinatura HMAC e idempotência para eventos fictícios;
 - análise limitada do Claude por schema de ferramenta, com fallback determinístico transparente;
@@ -55,13 +55,13 @@ pnpm check
 
 O comando executa lint, TypeScript, testes e build de produção.
 
-## Último passo de publicação
+## Próximos passos de divulgação
 
-1. criar o novo projeto Supabase isolado após confirmação da organização e do custo;
-2. aplicar migration e seed, revisar os avisos de segurança e conectar a Vercel;
-3. gravar o vídeo usando o roteiro já preparado;
-4. tornar o repositório acessível ao recrutador somente com autorização do proprietário.
+1. gravar o vídeo usando o roteiro já preparado;
+2. incluir o projeto no portfólio e no LinkedIn;
+3. tornar o repositório acessível ao recrutador somente com autorização do proprietário.
 
 Consulte o [Technical Design Document](docs/TDD.md), as [regras de segurança](docs/SECURITY.md),
 o [roteiro de demonstração](docs/DEMO_SCRIPT.md), o [case de portfólio](docs/PORTFOLIO_CASE.md)
 e o [pacote para candidatura](docs/APPLICATION_PACKAGE.md).
+
